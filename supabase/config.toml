@@ -1,0 +1,4 @@
+project_id = "bovsmsyvnlkufhnfmgwx"
+
+[functions.prd-feedback]
+verify_jwt = false

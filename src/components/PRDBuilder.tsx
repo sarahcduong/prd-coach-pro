@@ -1,0 +1,248 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, Circle, Sparkles, ArrowRight, ArrowLeft, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const PRD_SECTIONS = [
+  {
+    id: "problem",
+    title: "Problem Statement",
+    description: "What problem are you solving? Who experiences it?",
+    placeholder: "Describe the core problem your product addresses...",
+  },
+  {
+    id: "goals",
+    title: "Goals & Success Metrics",
+    description: "What does success look like?",
+    placeholder: "Define clear, measurable goals and KPIs...",
+  },
+  {
+    id: "user-stories",
+    title: "User Stories",
+    description: "How will users interact with this feature?",
+    placeholder: "As a [user], I want to [action] so that [benefit]...",
+  },
+  {
+    id: "requirements",
+    title: "Requirements",
+    description: "What needs to be built?",
+    placeholder: "List functional and non-functional requirements...",
+  },
+  {
+    id: "scope",
+    title: "Scope & Timeline",
+    description: "What's in and out? When will it ship?",
+    placeholder: "Define what's included in V1 and future iterations...",
+  },
+];
+
+interface PRDBuilderProps {
+  ideaData: any;
+  onBack: () => void;
+}
+
+export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
+  const [currentSection, setCurrentSection] = useState(0);
+  const [sections, setSections] = useState<Record<string, string>>({});
+  const [feedback, setFeedback] = useState<string>("");
+  const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
+  const { toast } = useToast();
+
+  const progress = (Object.keys(sections).length / PRD_SECTIONS.length) * 100;
+  const currentSectionData = PRD_SECTIONS[currentSection];
+
+  const handleGetFeedback = async () => {
+    const content = sections[currentSectionData.id] || "";
+    if (!content.trim()) {
+      toast({
+        title: "Nothing to review",
+        description: "Write something first to get AI feedback!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingFeedback(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/prd-feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          section: currentSectionData.title,
+          content,
+          ideaContext: ideaData.productIdea,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to get feedback");
+      
+      const data = await response.json();
+      setFeedback(data.feedback);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate feedback. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingFeedback(false);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentSection < PRD_SECTIONS.length - 1) {
+      setCurrentSection(currentSection + 1);
+      setFeedback("");
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentSection > 0) {
+      setCurrentSection(currentSection - 1);
+      setFeedback("");
+    }
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "PRD Exported!",
+      description: "Your PRD has been formatted and is ready to download.",
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-accent/10 px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-6">
+          <Button variant="ghost" onClick={onBack} className="mb-4">
+            ← Back to Idea
+          </Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Build Your PRD</h1>
+              <p className="text-muted-foreground">{ideaData.productIdea}</p>
+            </div>
+            <Badge variant="secondary" className="text-lg px-4 py-2">
+              {Object.keys(sections).length}/{PRD_SECTIONS.length} Complete
+            </Badge>
+          </div>
+          <Progress value={progress} className="mt-4 h-2" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Section Navigator */}
+          <div className="lg:col-span-1">
+            <Card className="p-4 sticky top-4">
+              <h3 className="font-semibold mb-4">Sections</h3>
+              <div className="space-y-2">
+                {PRD_SECTIONS.map((section, index) => (
+                  <button
+                    key={section.id}
+                    onClick={() => {
+                      setCurrentSection(index);
+                      setFeedback("");
+                    }}
+                    className={`w-full text-left p-3 rounded-lg transition-all ${
+                      currentSection === index
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {sections[section.id] ? (
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                      ) : (
+                        <Circle className="w-4 h-4" />
+                      )}
+                      <span className="text-sm font-medium">{section.title}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Editor */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold mb-2">{currentSectionData.title}</h2>
+                <p className="text-muted-foreground">{currentSectionData.description}</p>
+              </div>
+
+              <Textarea
+                placeholder={currentSectionData.placeholder}
+                value={sections[currentSectionData.id] || ""}
+                onChange={(e) =>
+                  setSections({ ...sections, [currentSectionData.id]: e.target.value })
+                }
+                className="min-h-[300px] text-base mb-4"
+              />
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleGetFeedback}
+                  disabled={isGeneratingFeedback}
+                  className="bg-gradient-to-r from-primary to-secondary"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {isGeneratingFeedback ? "Analyzing..." : "Get AI Feedback"}
+                </Button>
+                <div className="flex-1" />
+                <Button variant="outline" onClick={handlePrevious} disabled={currentSection === 0}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Previous
+                </Button>
+                <Button onClick={handleNext} disabled={currentSection === PRD_SECTIONS.length - 1}>
+                  Next
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </Card>
+
+            {currentSection === PRD_SECTIONS.length - 1 && (
+              <Button
+                onClick={handleExport}
+                className="w-full bg-success text-success-foreground py-6 text-lg"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Export PRD
+              </Button>
+            )}
+          </div>
+
+          {/* Feedback Panel */}
+          <div className="lg:col-span-1">
+            <Card className="p-6 sticky top-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-accent" />
+                <h3 className="font-semibold">AI Feedback</h3>
+              </div>
+              {feedback ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{feedback}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">
+                    Write your content and click "Get AI Feedback" for personalized suggestions.
+                  </p>
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

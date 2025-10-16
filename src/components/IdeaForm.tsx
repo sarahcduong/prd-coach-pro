@@ -34,7 +34,7 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-accent/10 px-4 py-12">
+    <div className="min-h-screen bg-background px-4 py-12">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <Button variant="ghost" onClick={onBack} className="mb-4">

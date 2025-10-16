@@ -7,14 +7,14 @@ interface HeroProps {
 
 export const Hero = ({ onGetStarted }: HeroProps) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-accent/10 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="max-w-4xl mx-auto text-center space-y-8 py-20">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
           <Sparkles className="w-4 h-4 text-accent" />
           <span className="text-sm font-medium text-accent-foreground">AI-Powered PRD Learning</span>
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
+        <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight">
           Master Product Specs
           <br />
           Like a Pro PM

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +50,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
   const [sections, setSections] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string>("");
   const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
+  const [hoveredFeedback, setHoveredFeedback] = useState<number | null>(null);
   const { toast } = useToast();
 
   const progress = (Object.keys(sections).length / PRD_SECTIONS.length) * 100;
@@ -77,7 +78,13 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
         body: JSON.stringify({
           section: currentSectionData.title,
           content,
-          ideaContext: ideaData.productIdea,
+          ideaContext: {
+            productIdea: ideaData.productIdea,
+            persona: ideaData.persona,
+            company: ideaData.company,
+            jobDescription: ideaData.jobDescription,
+            customOutline: ideaData.customOutline,
+          },
         }),
       });
 
@@ -177,14 +184,16 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                 <p className="text-muted-foreground">{currentSectionData.description}</p>
               </div>
 
-              <Textarea
-                placeholder={currentSectionData.placeholder}
-                value={sections[currentSectionData.id] || ""}
-                onChange={(e) =>
-                  setSections({ ...sections, [currentSectionData.id]: e.target.value })
-                }
-                className="min-h-[300px] text-base mb-4"
-              />
+              <div className="relative">
+                <Textarea
+                  placeholder={currentSectionData.placeholder}
+                  value={sections[currentSectionData.id] || ""}
+                  onChange={(e) => {
+                    setSections({ ...sections, [currentSectionData.id]: e.target.value });
+                  }}
+                  className="min-h-[300px] text-base mb-4"
+                />
+              </div>
 
               <div className="flex gap-3">
                 <Button
@@ -226,16 +235,57 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                 <h3 className="font-semibold">AI Feedback</h3>
               </div>
               {feedback ? (
-                <div className="space-y-4">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{feedback}</p>
-                  </div>
+                <div className="space-y-3">
+                  {feedback.split('\n\n').filter(p => p.trim()).map((paragraph, idx) => {
+                    const quotedText = paragraph.match(/"([^"]+)"/)?.[1];
+                    const isHovered = hoveredFeedback === idx;
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-3 rounded-lg border-l-4 transition-all cursor-pointer ${
+                          isHovered 
+                            ? 'bg-primary/10 border-primary shadow-md' 
+                            : 'bg-muted/50 border-transparent hover:bg-muted'
+                        }`}
+                        onMouseEnter={() => {
+                          setHoveredFeedback(idx);
+                          // Highlight the quoted text in the textarea
+                          if (quotedText) {
+                            const content = sections[currentSectionData.id] || "";
+                            const startIndex = content.indexOf(quotedText);
+                            if (startIndex !== -1) {
+                              const textarea = document.querySelector('textarea');
+                              if (textarea) {
+                                textarea.focus();
+                                textarea.setSelectionRange(startIndex, startIndex + quotedText.length);
+                              }
+                            }
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredFeedback(null);
+                          const textarea = document.querySelector('textarea');
+                          if (textarea) {
+                            textarea.blur();
+                          }
+                        }}
+                      >
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{paragraph}</p>
+                        {quotedText && (
+                          <div className="mt-2 text-xs text-muted-foreground italic">
+                            💡 Hover to highlight this text in your content
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">
-                    Write your content and click "Get AI Feedback" for personalized suggestions.
+                    Write your content and click "Get AI Feedback" for personalized suggestions with highlighted correlations.
                   </p>
                 </div>
               )}

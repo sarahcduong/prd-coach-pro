@@ -16,6 +16,8 @@ export interface IdeaFormData {
   persona?: string;
   company?: string;
   jobDescription?: string;
+  customOutline?: string;
+  templateFile?: File;
 }
 
 export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
@@ -24,12 +26,20 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
     persona: "",
     company: "",
     jobDescription: "",
+    customOutline: "",
   });
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.productIdea.trim()) {
-      onSubmit(formData);
+      onSubmit({ ...formData, templateFile: templateFile || undefined });
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setTemplateFile(e.target.files[0]);
     }
   };
 
@@ -111,6 +121,46 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
                     value={formData.jobDescription}
                     onChange={(e) => setFormData({ ...formData, jobDescription: e.target.value })}
                   />
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Custom PRD Structure
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Different companies use different PRD formats. You can upload a template or describe your preferred outline.
+                </p>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="customOutline" className="text-base">
+                    Describe Your Preferred Outline
+                  </Label>
+                  <Textarea
+                    id="customOutline"
+                    placeholder="E.g., 1. Executive Summary 2. Problem Statement 3. Goals & Metrics 4. User Stories..."
+                    value={formData.customOutline}
+                    onChange={(e) => setFormData({ ...formData, customOutline: e.target.value })}
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="templateFile" className="text-base">
+                    Or Upload a Template
+                  </Label>
+                  <Input
+                    id="templateFile"
+                    type="file"
+                    accept=".pdf,.doc,.docx,.txt"
+                    onChange={handleFileChange}
+                    className="cursor-pointer"
+                  />
+                  {templateFile && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {templateFile.name}
+                    </p>
+                  )}
                 </div>
               </div>
 

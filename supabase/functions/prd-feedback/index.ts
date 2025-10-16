@@ -21,23 +21,44 @@ serve(async (req) => {
     }
 
     const systemPrompt = `You are an experienced product manager providing constructive feedback on PRD sections. 
+
+CRITICAL: For each piece of feedback, you MUST quote the exact text from the user's content that you're referring to.
+Use quotation marks around the specific text you're commenting on.
+
+Format each feedback point as a separate paragraph with:
+1. A direct quote from their text (in "quotes")
+2. Your specific suggestion for improvement
+3. A brief example of how to improve it
+
 Your feedback should be:
-- Specific and actionable
+- Specific and actionable with quoted references
 - Encouraging but honest
 - Focused on PM best practices
 - Limited to 3-4 key points
-- Include examples of improvements
+- Each point should reference specific text they wrote
 
-Keep feedback concise (under 200 words).`;
+Keep each feedback point concise (2-3 sentences per point).`;
 
-    const userPrompt = `Product Idea Context: ${ideaContext}
+    const contextInfo = typeof ideaContext === 'string' ? ideaContext : 
+      `Product Idea: ${ideaContext.productIdea}
+${ideaContext.persona ? `Target Persona: ${ideaContext.persona}` : ''}
+${ideaContext.company ? `Company: ${ideaContext.company}` : ''}
+${ideaContext.jobDescription ? `Role: ${ideaContext.jobDescription}` : ''}
+${ideaContext.customOutline ? `Custom PRD Structure: ${ideaContext.customOutline}` : ''}`;
+
+    const userPrompt = `${contextInfo}
 
 PRD Section: ${section}
 
 User's Response:
 ${content}
 
-Provide constructive feedback on this PRD section. Focus on clarity, structure, and PM thinking.`;
+Provide 3-4 specific feedback points. For EACH point, quote the exact text you're referring to in "quotation marks", then explain what needs improvement and how to fix it.
+
+Example format:
+"[exact quote from their text]" - This could be stronger because... Try rephrasing as: "[improved version]"
+
+Separate each feedback point with a blank line.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

@@ -245,12 +245,22 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                 <p className="text-muted-foreground">{currentSectionData.description}</p>
               </div>
 
-              <div className="mb-4 p-4 bg-muted/50 rounded-lg border border-border">
-                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  Best Practice Example
-                </h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{currentSectionData.example}</p>
+              <div className="mb-4 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border-2 border-primary/20">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Best Practice Example
+                  </h3>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30 text-xs">
+                    From Leland+
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground/90 whitespace-pre-wrap mb-3">{currentSectionData.example}</p>
+                <div className="flex items-center gap-2 pt-2 border-t border-primary/10">
+                  <div className="text-xs text-muted-foreground">
+                    💡 <span className="font-medium">Leland+</span> provides expert-reviewed PM resources for students
+                  </div>
+                </div>
               </div>
 
               <div className="relative">

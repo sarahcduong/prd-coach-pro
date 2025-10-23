@@ -13,30 +13,90 @@ const PRD_SECTIONS = [
     title: "Problem Statement",
     description: "What problem are you solving? Who experiences it?",
     placeholder: "Describe the core problem your product addresses...",
+    example: `"Small business owners struggle to manage their inventory across multiple sales channels, leading to overselling, stockouts, and lost revenue. Current solutions are either too complex and expensive for SMBs or lack multi-channel integration.
+
+Key pain points:
+• Manual inventory updates across 3+ platforms take 2-3 hours daily
+• 15% of orders result in overselling issues
+• No real-time visibility into stock levels
+
+Target users: Small retail businesses (5-50 employees) selling on e-commerce platforms, marketplaces, and physical stores."`,
   },
   {
     id: "goals",
     title: "Goals & Success Metrics",
     description: "What does success look like?",
     placeholder: "Define clear, measurable goals and KPIs...",
+    example: `Business Goals:
+• Reduce inventory management time by 70%
+• Eliminate overselling incidents within 3 months
+• Increase customer retention by 25%
+
+Success Metrics:
+• Daily Active Users (DAU): 1,000 within 6 months
+• Inventory sync accuracy: 99.5%
+• Time to sync across channels: <30 seconds
+• Customer satisfaction (CSAT): >4.5/5
+• Churn rate: <5% monthly`,
   },
   {
     id: "user-stories",
     title: "User Stories",
     description: "How will users interact with this feature?",
     placeholder: "As a [user], I want to [action] so that [benefit]...",
+    example: `As a store owner, I want to:
+• Connect all my sales channels (Shopify, Amazon, eBay) in one dashboard so that I can view inventory in real-time
+• Receive alerts when stock levels fall below threshold so that I can reorder before stockouts
+• Automatically sync inventory changes across all platforms so that I don't have to manually update each channel
+
+As a warehouse manager, I want to:
+• Scan barcodes to update inventory so that changes reflect immediately across all channels
+• View which products are selling fastest so that I can prioritize restocking`,
   },
   {
     id: "requirements",
     title: "Requirements",
     description: "What needs to be built?",
     placeholder: "List functional and non-functional requirements...",
+    example: `Functional Requirements:
+• Multi-channel integration (Shopify, WooCommerce, Amazon, eBay)
+• Real-time inventory synchronization (<30 sec delay)
+• Low stock alerts (customizable thresholds)
+• Barcode scanning via mobile app
+• Inventory history and audit logs
+• Bulk import/export via CSV
+
+Non-Functional Requirements:
+• 99.9% uptime
+• Support 10,000+ SKUs per account
+• Mobile-responsive dashboard
+• GDPR compliant data handling
+• API rate limiting: 100 requests/min`,
   },
   {
     id: "scope",
     title: "Scope & Timeline",
     description: "What's in and out? When will it ship?",
     placeholder: "Define what's included in V1 and future iterations...",
+    example: `V1 Scope (Q2 2024):
+In Scope:
+• Integration with Shopify and WooCommerce
+• Real-time inventory sync
+• Low stock email alerts
+• Web dashboard with basic reporting
+• CSV import/export
+
+Out of Scope:
+• Amazon/eBay integration (V2)
+• Mobile app (V2)
+• Advanced analytics and forecasting (V3)
+• Multi-warehouse support (V3)
+
+Timeline:
+• Design & Planning: 2 weeks
+• Development: 8 weeks
+• Testing & QA: 2 weeks
+• Beta Launch: Week 12`,
   },
 ];
 
@@ -84,6 +144,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
             company: ideaData.company,
             jobDescription: ideaData.jobDescription,
             customOutline: ideaData.customOutline,
+            purpose: ideaData.purpose,
           },
         }),
       });
@@ -182,6 +243,14 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
               <div className="mb-4">
                 <h2 className="text-2xl font-bold mb-2">{currentSectionData.title}</h2>
                 <p className="text-muted-foreground">{currentSectionData.description}</p>
+              </div>
+
+              <div className="mb-4 p-4 bg-muted/50 rounded-lg border border-border">
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  Best Practice Example
+                </h3>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{currentSectionData.example}</p>
               </div>
 
               <div className="relative">

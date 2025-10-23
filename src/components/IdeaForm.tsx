@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Lightbulb } from "lucide-react";
 
 interface IdeaFormProps {
@@ -18,6 +19,7 @@ export interface IdeaFormData {
   jobDescription?: string;
   customOutline?: string;
   templateFile?: File;
+  purpose: "recruiting" | "deliverable";
 }
 
 export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
@@ -27,6 +29,7 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
     company: "",
     jobDescription: "",
     customOutline: "",
+    purpose: "deliverable",
   });
   const [templateFile, setTemplateFile] = useState<File | null>(null);
 
@@ -68,6 +71,32 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">
+                  What is this PRD for? *
+                </Label>
+                <RadioGroup
+                  value={formData.purpose}
+                  onValueChange={(value: "recruiting" | "deliverable") =>
+                    setFormData({ ...formData, purpose: value })
+                  }
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="deliverable" id="deliverable" />
+                    <Label htmlFor="deliverable" className="font-normal cursor-pointer">
+                      Company Deliverable
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="recruiting" id="recruiting" />
+                    <Label htmlFor="recruiting" className="font-normal cursor-pointer">
+                      Recruiting/Interview Exercise
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="productIdea" className="text-base font-semibold">
                   Your Idea *

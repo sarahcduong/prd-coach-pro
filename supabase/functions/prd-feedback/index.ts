@@ -20,7 +20,9 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `You are an experienced product manager providing constructive feedback on PRD sections. 
+    const isPurposeRecruiting = ideaContext.purpose === 'recruiting';
+    
+    const systemPrompt = `You are an experienced product manager providing constructive feedback on PRD sections${isPurposeRecruiting ? ' for a recruiting/interview exercise. Focus on demonstrating PM thinking, structured approach, and strategic insight that would impress hiring managers' : ' for a real company deliverable. Focus on practical implementation, stakeholder alignment, and execution excellence'}.
 
 CRITICAL: For each piece of feedback, you MUST quote the exact text from the user's content that you're referring to.
 Use quotation marks around the specific text you're commenting on.
@@ -34,6 +36,7 @@ Your feedback should be:
 - Specific and actionable with quoted references
 - Encouraging but honest
 - Focused on PM best practices
+${isPurposeRecruiting ? '- Emphasize clear communication, strategic thinking, data-driven decisions, and understanding of PM frameworks' : '- Emphasize feasibility, stakeholder buy-in, resource planning, and clear success metrics'}
 - Limited to 3-4 key points
 - Each point should reference specific text they wrote
 
@@ -41,6 +44,7 @@ Keep each feedback point concise (2-3 sentences per point).`;
 
     const contextInfo = typeof ideaContext === 'string' ? ideaContext : 
       `Product Idea: ${ideaContext.productIdea}
+Purpose: ${isPurposeRecruiting ? 'Recruiting/Interview Exercise' : 'Company Deliverable'}
 ${ideaContext.persona ? `Target Persona: ${ideaContext.persona}` : ''}
 ${ideaContext.company ? `Company: ${ideaContext.company}` : ''}
 ${ideaContext.jobDescription ? `Role: ${ideaContext.jobDescription}` : ''}

@@ -173,10 +173,56 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
   const [feedback, setFeedback] = useState<string>("");
   const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
   const [hoveredFeedback, setHoveredFeedback] = useState<number | null>(null);
+  const [prdSections, setPrdSections] = useState(PRD_SECTIONS);
+  const [isParsingOutline, setIsParsingOutline] = useState(false);
   const { toast } = useToast();
 
-  const progress = (Object.keys(sections).length / PRD_SECTIONS.length) * 100;
-  const currentSectionData = PRD_SECTIONS[currentSection];
+  // Parse custom outline if provided
+  useEffect(() => {
+    const parseCustomOutline = async () => {
+      if (!ideaData.customOutline || ideaData.customOutline.trim() === "") {
+        setPrdSections(PRD_SECTIONS);
+        return;
+      }
+
+      setIsParsingOutline(true);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-outline`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            customOutline: ideaData.customOutline,
+          }),
+        });
+
+        if (!response.ok) throw new Error("Failed to parse outline");
+
+        const data = await response.json();
+        if (data.sections && data.sections.length > 0) {
+          setPrdSections(data.sections);
+        } else {
+          setPrdSections(PRD_SECTIONS);
+        }
+      } catch (error) {
+        console.error("Error parsing custom outline:", error);
+        toast({
+          title: "Using default structure",
+          description: "Couldn't parse custom outline. Using standard PRD sections.",
+        });
+        setPrdSections(PRD_SECTIONS);
+      } finally {
+        setIsParsingOutline(false);
+      }
+    };
+
+    parseCustomOutline();
+  }, [ideaData.customOutline, toast]);
+
+  const progress = (Object.keys(sections).length / prdSections.length) * 100;
+  const currentSectionData = prdSections[currentSection];
 
   const handleGetFeedback = async () => {
     const content = sections[currentSectionData.id] || "";
@@ -227,7 +273,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
   };
 
   const handleNext = () => {
-    if (currentSection < PRD_SECTIONS.length - 1) {
+    if (currentSection < prdSections.length - 1) {
       setCurrentSection(currentSection + 1);
       setFeedback("");
     }
@@ -260,7 +306,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
               <p className="text-muted-foreground">{ideaData.productIdea}</p>
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">
-              {Object.keys(sections).length}/{PRD_SECTIONS.length} Complete
+              {Object.keys(sections).length}/{prdSections.length} Complete
             </Badge>
           </div>
           <Progress value={progress} className="mt-4 h-2" />
@@ -271,31 +317,37 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
           <div className="lg:col-span-1">
             <Card className="p-4 sticky top-4">
               <h3 className="font-semibold mb-4">Sections</h3>
-              <div className="space-y-2">
-                {PRD_SECTIONS.map((section, index) => (
-                  <button
-                    key={section.id}
-                    onClick={() => {
-                      setCurrentSection(index);
-                      setFeedback("");
-                    }}
-                    className={`w-full text-left p-3 rounded-lg transition-all ${
-                      currentSection === index
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {sections[section.id] ? (
-                        <CheckCircle2 className="w-4 h-4 text-success" />
-                      ) : (
-                        <Circle className="w-4 h-4" />
-                      )}
-                      <span className="text-sm font-medium">{section.title}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {isParsingOutline ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">Parsing your custom outline...</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {prdSections.map((section, index) => (
+                    <button
+                      key={section.id}
+                      onClick={() => {
+                        setCurrentSection(index);
+                        setFeedback("");
+                      }}
+                      className={`w-full text-left p-3 rounded-lg transition-all ${
+                        currentSection === index
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {sections[section.id] ? (
+                          <CheckCircle2 className="w-4 h-4 text-success" />
+                        ) : (
+                          <Circle className="w-4 h-4" />
+                        )}
+                        <span className="text-sm font-medium">{section.title}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </Card>
           </div>
 
@@ -317,29 +369,33 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                     From Leland+
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground/90 whitespace-pre-wrap mb-3">{currentSectionData.example}</p>
-                <div className="pt-3 border-t border-primary/10 space-y-2">
-                  <div className="text-xs text-muted-foreground mb-2">
-                    💡 <span className="font-medium">Leland+</span> provides expert-reviewed PM resources for students
-                  </div>
-                  {currentSectionData.lelandLinks && currentSectionData.lelandLinks.length > 0 && (
-                    <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-primary">Learn more from Leland+:</p>
-                      {currentSectionData.lelandLinks.map((link, idx) => (
-                        <a
-                          key={idx}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors group"
-                        >
-                          <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          <span className="underline underline-offset-2">{link.title}</span>
-                        </a>
-                      ))}
+                {currentSectionData.example && (
+                  <>
+                    <p className="text-sm text-muted-foreground/90 whitespace-pre-wrap mb-3">{currentSectionData.example}</p>
+                    <div className="pt-3 border-t border-primary/10 space-y-2">
+                      <div className="text-xs text-muted-foreground mb-2">
+                        💡 <span className="font-medium">Leland+</span> provides expert-reviewed PM resources for students
+                      </div>
+                      {currentSectionData.lelandLinks && currentSectionData.lelandLinks.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-semibold text-primary">Learn more from Leland+:</p>
+                          {currentSectionData.lelandLinks.map((link, idx) => (
+                            <a
+                              key={idx}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors group"
+                            >
+                              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                              <span className="underline underline-offset-2">{link.title}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
 
               <div className="relative">
@@ -367,14 +423,14 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Previous
                 </Button>
-                <Button onClick={handleNext} disabled={currentSection === PRD_SECTIONS.length - 1}>
+                <Button onClick={handleNext} disabled={currentSection === prdSections.length - 1}>
                   Next
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </Card>
 
-            {currentSection === PRD_SECTIONS.length - 1 && (
+            {currentSection === prdSections.length - 1 && (
               <Button
                 onClick={handleExport}
                 className="w-full bg-success text-success-foreground py-6 text-lg"

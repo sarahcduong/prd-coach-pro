@@ -142,14 +142,23 @@ export const IdeaForm = ({ onSubmit, onBack }: IdeaFormProps) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="jobDescription" className="text-base">
-                    Target Role
+                    {formData.purpose === "deliverable" ? "Current Role" : "Target Role"}
                   </Label>
                   <Input
                     id="jobDescription"
-                    placeholder="E.g., APM at Meta, Growth PM..."
+                    placeholder={
+                      formData.purpose === "deliverable"
+                        ? "E.g., Senior Product Manager at TechCorp"
+                        : "E.g., APM at Meta, Growth PM..."
+                    }
                     value={formData.jobDescription}
                     onChange={(e) => setFormData({ ...formData, jobDescription: e.target.value })}
                   />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {formData.purpose === "deliverable"
+                      ? "Your current position and company"
+                      : "The role you're preparing for"}
+                  </p>
                 </div>
               </div>
 

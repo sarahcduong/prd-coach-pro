@@ -23,6 +23,10 @@ Key pain points:
 Target users: Small retail businesses (5-50 employees) selling on e-commerce platforms, marketplaces, and physical stores."`,
     lelandLinks: [
       {
+        title: "Understanding Users & Problem Spaces",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdb3b85d53ec4ea9359d04"
+      },
+      {
         title: "Requirements Gathering for UX Designers",
         url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
       },
@@ -74,6 +78,10 @@ As a warehouse manager, I want to:
 • View which products are selling fastest so that I can prioritize restocking`,
     lelandLinks: [
       {
+        title: "Understanding Users & Problem Spaces",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdb3b85d53ec4ea9359d04"
+      },
+      {
         title: "Requirements Gathering for UX Designers",
         url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
       },
@@ -103,6 +111,10 @@ Non-Functional Requirements:
 • GDPR compliant data handling
 • API rate limiting: 100 requests/min`,
     lelandLinks: [
+      {
+        title: "Product Management 101",
+        url: "https://www.joinleland.com/content/course/urn:course:68c9492fdf84b203d53079e7"
+      },
       {
         title: "Requirements Gathering for UX Designers",
         url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
@@ -134,6 +146,10 @@ Timeline:
 • Testing & QA: 2 weeks
 • Beta Launch: Week 12`,
     lelandLinks: [
+      {
+        title: "Overview of Product Management",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdaef05d53ec4ea9353196"
+      },
       {
         title: "Product Thinking & Strategy",
         url: "https://www.joinleland.com/content/course/urn:course:68cdaef05d53ec4ea9353196/urn:contentEntry:68c963cfb399bfc15f000206"

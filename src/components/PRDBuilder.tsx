@@ -204,7 +204,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
           <Progress value={progress} className="mt-4 h-2" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className={`grid grid-cols-1 gap-6 ${feedback ? 'lg:grid-cols-6' : 'lg:grid-cols-4'}`}>
           {/* Section Navigator */}
           <div className="lg:col-span-1">
             <Card className="p-4 sticky top-4">
@@ -238,7 +238,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
           </div>
 
           {/* Main Editor */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className={`space-y-6 ${feedback ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
             <Card className="p-6">
               <div className="mb-4">
                 <h2 className="text-2xl font-bold mb-2">{currentSectionData.title}</h2>
@@ -307,7 +307,7 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
           </div>
 
           {/* Feedback Panel */}
-          <div className="lg:col-span-1">
+          <div className={feedback ? 'lg:col-span-2' : 'lg:col-span-1'}>
             <Card className="p-6 sticky top-4">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-accent" />

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Sparkles, ArrowRight, ArrowLeft, Download } from "lucide-react";
+import { CheckCircle2, Circle, Sparkles, ArrowRight, ArrowLeft, Download, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PRD_SECTIONS = [
@@ -21,6 +21,16 @@ Key pain points:
 • No real-time visibility into stock levels
 
 Target users: Small retail businesses (5-50 employees) selling on e-commerce platforms, marketplaces, and physical stores."`,
+    lelandLinks: [
+      {
+        title: "Requirements Gathering for UX Designers",
+        url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
+      },
+      {
+        title: "Product Discovery and Ideation",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdb6cbb1c8a7104e455eda/urn:contentEntry:68c8e577810fce6e6ae76f33"
+      }
+    ]
   },
   {
     id: "goals",
@@ -38,6 +48,16 @@ Success Metrics:
 • Time to sync across channels: <30 seconds
 • Customer satisfaction (CSAT): >4.5/5
 • Churn rate: <5% monthly`,
+    lelandLinks: [
+      {
+        title: "Metrics, Analytics, and Decision Making",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdbe15b1c8a7104e461624/urn:contentEntry:68c8e67d8945a7a314b53ad7"
+      },
+      {
+        title: "Product Thinking & Strategy",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdaef05d53ec4ea9353196/urn:contentEntry:68c963cfb399bfc15f000206"
+      }
+    ]
   },
   {
     id: "user-stories",
@@ -52,6 +72,16 @@ Success Metrics:
 As a warehouse manager, I want to:
 • Scan barcodes to update inventory so that changes reflect immediately across all channels
 • View which products are selling fastest so that I can prioritize restocking`,
+    lelandLinks: [
+      {
+        title: "Requirements Gathering for UX Designers",
+        url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
+      },
+      {
+        title: "Product Discovery and Ideation",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdb6cbb1c8a7104e455eda/urn:contentEntry:68c8e577810fce6e6ae76f33"
+      }
+    ]
   },
   {
     id: "requirements",
@@ -72,6 +102,12 @@ Non-Functional Requirements:
 • Mobile-responsive dashboard
 • GDPR compliant data handling
 • API rate limiting: 100 requests/min`,
+    lelandLinks: [
+      {
+        title: "Requirements Gathering for UX Designers",
+        url: "https://www.joinleland.com/content/item/urn:contentEntry:689b5d87dac66cae1ed96aae?fromName=Product+Management"
+      }
+    ]
   },
   {
     id: "scope",
@@ -97,6 +133,16 @@ Timeline:
 • Development: 8 weeks
 • Testing & QA: 2 weeks
 • Beta Launch: Week 12`,
+    lelandLinks: [
+      {
+        title: "Product Thinking & Strategy",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdaef05d53ec4ea9353196/urn:contentEntry:68c963cfb399bfc15f000206"
+      },
+      {
+        title: "Product Discovery and Ideation",
+        url: "https://www.joinleland.com/content/course/urn:course:68cdb6cbb1c8a7104e455eda/urn:contentEntry:68c8e577810fce6e6ae76f33"
+      }
+    ]
   },
 ];
 
@@ -256,10 +302,27 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground/90 whitespace-pre-wrap mb-3">{currentSectionData.example}</p>
-                <div className="flex items-center gap-2 pt-2 border-t border-primary/10">
-                  <div className="text-xs text-muted-foreground">
+                <div className="pt-3 border-t border-primary/10 space-y-2">
+                  <div className="text-xs text-muted-foreground mb-2">
                     💡 <span className="font-medium">Leland+</span> provides expert-reviewed PM resources for students
                   </div>
+                  {currentSectionData.lelandLinks && currentSectionData.lelandLinks.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-semibold text-primary">Learn more from Leland+:</p>
+                      {currentSectionData.lelandLinks.map((link, idx) => (
+                        <a
+                          key={idx}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors group"
+                        >
+                          <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          <span className="underline underline-offset-2">{link.title}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

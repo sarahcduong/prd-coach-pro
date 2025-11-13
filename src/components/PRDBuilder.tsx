@@ -287,19 +287,66 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
   };
 
   const handleExport = () => {
+    // Create a formatted PRD document
+    let prdContent = `# ${ideaData.productIdea}\n\n`;
+    prdContent += `**Purpose:** ${ideaData.purpose === 'deliverable' ? 'Company Deliverable' : 'Recruiting Portfolio'}\n`;
+    if (ideaData.persona) prdContent += `**Role:** ${ideaData.persona}\n`;
+    if (ideaData.company) prdContent += `**Company Context:** ${ideaData.company}\n`;
+    prdContent += `\n---\n\n`;
+
+    // Add all completed sections
+    prdSections.forEach((section) => {
+      const content = sections[section.id];
+      if (content && content.trim()) {
+        prdContent += `## ${section.title}\n\n`;
+        prdContent += `${content}\n\n`;
+        prdContent += `---\n\n`;
+      }
+    });
+
+    // Add metadata
+    prdContent += `\n_Generated on ${new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })}_\n`;
+    prdContent += `_Powered by Leland+ PRD Builder_\n`;
+
+    // Create and download the file
+    const blob = new Blob([prdContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `PRD-${ideaData.productIdea.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
     toast({
       title: "PRD Exported!",
-      description: "Your PRD has been formatted and is ready to download.",
+      description: "Your PRD has been downloaded as a Markdown file.",
     });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-accent/10 px-4 py-8">
       <div className="max-w-6xl mx-auto">
+        {/* Header with Export Button */}
         <div className="mb-6">
-          <Button variant="ghost" onClick={onBack} className="mb-4">
-            ← Back to Idea
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" onClick={onBack}>
+              ← Back to Idea
+            </Button>
+            <Button
+              onClick={handleExport}
+              size="lg"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Export PRD
+            </Button>
+          </div>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Build Your PRD</h1>
@@ -430,15 +477,17 @@ export const PRDBuilder = ({ ideaData, onBack }: PRDBuilderProps) => {
               </div>
             </Card>
 
-            {currentSection === prdSections.length - 1 && (
+            {/* Sticky Export Button at Bottom for Mobile */}
+            <div className="lg:hidden fixed bottom-4 left-4 right-4 z-50">
               <Button
                 onClick={handleExport}
-                className="w-full bg-success text-success-foreground py-6 text-lg"
+                size="lg"
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-2xl text-lg py-6"
               >
                 <Download className="w-5 h-5 mr-2" />
                 Export PRD
               </Button>
-            )}
+            </div>
           </div>
 
           {/* Feedback Panel */}
